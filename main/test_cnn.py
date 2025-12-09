@@ -1,3 +1,8 @@
+"""
+Test script for CNN model using Gymnasium
+Compatible with gymnasium>=0.29.0 and stable-baselines3>=2.2.0
+"""
+import os
 import time
 import random
 
@@ -6,18 +11,20 @@ from sb3_contrib import MaskablePPO
 
 from snake_game_custom_wrapper_cnn import SnakeEnv
 
+# Determine model path
 if torch.backends.mps.is_available():
-    MODEL_PATH = r"trained_models_cnn_mps/ppo_snake_final"
+    base_dir = "trained_models_cnn_mps"
 else:
-    MODEL_PATH = r"trained_models_cnn/ppo_snake_final"
+    base_dir = "trained_models_cnn"
+
+MODEL_PATH = os.path.join(base_dir, "ppo_snake_final_gymnasium")
 
 NUM_EPISODE = 10
-
 RENDER = True
-FRAME_DELAY = 0.05 # 0.01 fast, 0.05 slow
+FRAME_DELAY = 0.05
 ROUND_DELAY = 5
 
-seed = random.randint(0, 1e9)
+seed = random.randint(0, int(1e9))
 print(f"Using seed = {seed} for testing.")
 
 if RENDER:
@@ -25,39 +32,35 @@ if RENDER:
 else:
     env = SnakeEnv(seed=seed, limit_step=False, silent_mode=True)
 
-# Load the trained model
+# Load trained model
 model = MaskablePPO.load(MODEL_PATH)
 
 total_reward = 0
 total_score = 0
-min_score = 1e9
+min_score = int(1e9)
 max_score = 0
 
 for episode in range(NUM_EPISODE):
-    obs = env.reset()
+    obs, info = env.reset()
     episode_reward = 0
     done = False
     
     num_step = 0
-    info = None
-
     sum_step_reward = 0
 
-    retry_limit = 9
     print(f"=================== Episode {episode + 1} ==================")
     while not done:
         action, _ = model.predict(obs, action_masks=env.get_action_mask())
-        prev_mask = env.get_action_mask()
-        prev_direction = env.game.direction
         num_step += 1
-        obs, reward, done, info = env.step(action)
+        obs, reward, terminated, truncated, info = env.step(action)
+        done = terminated or truncated
 
         if done:
             if info["snake_size"] == env.game.grid_size:
                 print(f"You are BREATHTAKING! Victory reward: {reward:.4f}.")
             else:
                 last_action = ["UP", "LEFT", "RIGHT", "DOWN"][action]
-                print(f"Gameover Penalty: {reward:.4f}. Last action: {last_action}")
+                print(f"Game over penalty: {reward:.4f}. Last action: {last_action}")
 
         elif info["food_obtained"]:
             print(f"Food obtained at step {num_step:04d}. Food Reward: {reward:.4f}. Step Reward: {sum_step_reward:.4f}")
