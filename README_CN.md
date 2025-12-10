@@ -1,110 +1,243 @@
-# SnakeAI
+# SnakeAI - 深度强化学习贪吃蛇游戏
 
-简体中文 | [English](README.md) | [日本語](README_JA.md)
+简体中文 | [English](README.md)
 
-本项目包含经典游戏《贪吃蛇》的程序脚本以及可以自动进行游戏的人工智能代理。该智能代理基于深度强化学习进行训练，包括两个版本：基于多层感知机（Multi-Layer Perceptron）的代理和基于卷积神经网络（Convolution Neural Network）的代理，其中后者的平均游戏分数更高。
+使用深度强化学习PPO（Proximal Policy Optimization）算法训练的贪吃蛇游戏AI。项目包含基于CNN和MLP的智能体，其中CNN版本性能更优。
 
-### 文件结构
+## 🎮 特性
+
+- **经典贪吃蛇游戏** - 使用Pygame实现的可玩游戏
+- **CNN智能体** - 基于卷积神经网络的视觉输入智能体
+- **MLP智能体** - 基于多层感知机的特征输入智能体
+- **课程学习** - 从简单到复杂的渐进式训练
+- **动作掩码** - 防止非法移动，提高训练效率
+- **并行训练** - 多进程环境加速学习
+
+## 📊 性能对比
+
+| 模型 | 训练速度 | 平均奖励 | 稳定性 | 推荐场景 |
+|------|----------|----------|--------|----------|
+| CNN (改进版) | ⚡⚡ | ~15-17 | ⭐⭐⭐ | **生产环境** ⭐ |
+| MLP | ⚡⚡⚡ | ~17 | ⭐⭐ | 快速原型 |
+| 课程学习 | ⚡⚡ | ~14-16 | ⭐⭐⭐ | 稳定训练 |
+
+## 🚀 快速开始
+
+### 环境要求
+
+- Python 3.11+
+- Conda（推荐）
+- 支持CUDA的GPU（可选，用于加速训练）
+
+### 安装
 
 ```bash
-├───main
-│   ├───logs
-│   ├───trained_models_cnn
-│   ├───trained_models_mlp
-│   └───scripts
-├───utils
-│   └───scripts
-```
+# 创建conda环境
+conda create -n SnakeAI-new python=3.11
+conda activate SnakeAI-new
 
-项目的主要代码文件夹为 `main/`。其中，`logs/` 包含训练过程的终端文本和数据曲线（使用 Tensorboard 查看）；`trained_models_cnn/` 与 `trained_models_mlp/` 分别包含卷积网络与感知机两种模型在不同阶段的模型权重文件，用于在 `test_cnn.py` 与 `test_mlp.py` 中运行测试，观看两种智能代理在不同训练阶段的实际游戏效果。
-
-另一个文件夹 `utils/` 包括两个工具脚本。`check_gpu_status/` 用于检查 GPU 是否可以被 PyTorch 调用；`compress_code.py` 可以将代码缩进、换行全部删去变成一行紧密排列的文本，方便与 GPT-4 进行交流，向 AI 询问代码建议（GPT-4 对代码的理解能力远高于人类，不需要缩进、换行等）。
-
-## 运行指南
-
-本项目基于 Python 编程语言，用到的外部代码库主要包括 [Pygame](https://www.pygame.org/news)、[OpenAI Gym](https://github.com/openai/gym)、[Stable-Baselines3](https://stable-baselines3.readthedocs.io/en/master/) 等。程序运行使用的 Python 版本为 3.8.16，建议使用 [Anaconda](https://www.anaconda.com) 配置 Python 环境。以下配置过程已在 Windows 11 系统上测试通过。以下为控制台/终端（Console/Terminal/Shell）指令。
-
-### 环境配置
-
-```bash
-# 创建 conda 环境，将其命名为 SnakeAI，Python 版本 3.8.16
-conda create -n SnakeAI python=3.8.16
-conda activate SnakeAI
-```
-
-在 Windows 与 macOS 下配置外部代码库的过程略有不同。Windows 下使用 CUDA 加速，macOS 下则使用 MPS (Metal Performance Shaders) 进行加速，且需要降级 `pip` 与 `setuptools`。
-
-Windows:
-```bash 
-# 使用 GPU 训练需要手动安装完整版 PyTorch
-conda install pytorch=2.0.0 torchvision pytorch-cuda=11.8 -c pytorch -c nvidia
-
-# 运行程序脚本测试 PyTorch 是否能成功调用 GPU
-python .\utils\check_gpu_status.py
-
-# 安装外部代码库
+# 安装依赖
 pip install -r requirements.txt
+
+# [可选] NVIDIA GPU加速
+# 安装支持CUDA的PyTorch（根据需要调整CUDA版本）
+conda install pytorch torchvision pytorch-cuda=12.1 -c pytorch -c nvidia
+
+# [可选] Apple Silicon (M1/M2/M3)
+# MPS (Metal Performance Shaders) 会自动检测
+# PyTorch 2.5+ 原生支持MPS
 ```
 
-macOS (Apple Silicon):
-```bash
-# 使用 GPU 训练需要手动安装 Apple Silicon 版 PyTorch
-conda install pytorch::pytorch=2.0.1 torchvision torchaudio -c pytorch
+**当前环境版本：**
+- Python: 3.11.14
+- PyTorch: 2.5.1
+- Stable-Baselines3: 2.7.1
+- Gymnasium: 1.2.2
+- Pygame: 2.6.1
 
-# 运行程序脚本测试 PyTorch 是否能成功调用 GPU
-python utils/check_gpu_status_mps.py
-
-# 安装 tensorboard
-pip install tensorboard==2.13.0
-
-# 降级安装外部代码库
-pip install setuptools==65.5.0 pip==21
-pip install -r requirements.txt
-```
-
-### 运行测试
-
-项目 `main/` 文件夹下包含经典游戏《贪吃蛇》的程序脚本，基于 [Pygame](https://www.pygame.org/news) 代码库，可以直接运行以下指令进行游戏：
+### 玩游戏
 
 ```bash
-cd [项目上级文件夹]/snake-ai/main
-python .\snake_game.py
+cd main
+python snake_game.py
 ```
 
-环境配置完成后，可以在 `main/` 文件夹下运行 `test_cnn.py` 或 `test_mlp.py` 进行测试，观察两种智能代理在不同训练阶段的实际表现。
+### 训练你自己的智能体
 
 ```bash
-cd [项目上级文件夹]/snake-ai/main
-python test_cnn.py
-python test_mlp.py
+cd main
+
+# 推荐：基于配置文件的训练
+python train_cnn_simple.py
+
+# 或使用其他训练脚本
+python train_cnn.py          # 基准CNN
+python train_mlp.py          # MLP版本
+python train_cnn_curriculum.py  # 课程学习
 ```
 
-模型权重文件存储在 `main/trained_models_cnn/` 与 `main/trained_models_mlp/` 文件夹下。两份测试脚本均默认调用训练完成后的模型。如果需要观察不同训练阶段的 AI 表现，可将测试脚本中的 `MODEL_PATH` 变量修改为其它模型的文件路径。
-
-### 训练模型
-
-如果需要重新训练模型，可以在 `main/` 文件夹下运行 `train_cnn.py` 或 `train_mlp.py`。
+### 测试训练好的模型
 
 ```bash
-cd [项目上级文件夹]/snake-ai/main
-python train_cnn.py
-python train_mlp.py
+cd main
+
+# 测试单个模型
+python test_cnn_v2.py trained_models_cnn_v2_mps/ppo_snake_final_v2.zip 10
+
+# 对比多个模型
+python test_cnn_v2.py --compare model1.zip model2.zip model3.zip 50
 ```
 
-### 查看曲线
-
-项目中包含了训练过程的 Tensorboard 曲线图，可以使用 Tensorboard 查看其中的详细数据。推荐使用 VSCode 集成的 Tensorboard 插件直接查看，也可以使用传统方法：
+### 监控训练
 
 ```bash
-cd [项目上级文件夹]/snake-ai/main
-tensorboard --logdir=logs/
+# 启动TensorBoard
+tensorboard --logdir main/logs
+
+# 在浏览器打开 http://localhost:6006
 ```
 
-在浏览器中打开 Tensorboard 服务默认地址 `http://localhost:6006/`，即可查看训练过程的交互式曲线图。
+## 📁 项目结构
 
-## 鸣谢
-本项目调用的外部代码库包括 [Pygame](https://www.pygame.org/news)、[OpenAI Gym](https://github.com/openai/gym)、[Stable-Baselines3](https://stable-baselines3.readthedocs.io/en/master/) 等。感谢各位软件工作者对开源社区的无私奉献！
+```
+snake-ai/
+├── main/                           # 主代码目录
+│   ├── snake_game.py              # 游戏引擎
+│   ├── snake_game_custom_wrapper_cnn_v2.py  # CNN环境包装器
+│   ├── snake_game_custom_wrapper_mlp.py     # MLP环境包装器
+│   ├── train_config.py            # 集中训练配置
+│   ├── train_cnn_simple.py        # ⭐ 推荐训练脚本
+│   ├── train_cnn.py               # 基准CNN训练
+│   ├── train_mlp.py               # MLP训练
+│   ├── train_cnn_curriculum.py    # 课程学习
+│   ├── test_cnn_v2.py             # CNN模型测试
+│   ├── test_mlp.py                # MLP模型测试
+│   ├── hamiltonian_agent.py       # 基准算法
+│   ├── trained_models_*/          # 保存的模型
+│   ├── logs/                      # TensorBoard日志
+│   ├── sound/                     # 音效文件
+│   ├── README.md                  # 详细使用指南
+│   └── PROJECT_ARCHITECTURE.md    # 架构文档
+├── utils/                         # 工具脚本
+│   ├── check_gpu_status.py        # GPU检测
+│   └── compress_code.py           # 代码压缩工具
+├── README.md                      # 英文README
+├── README_CN.md                   # 本文件
+├── TRAINING_GUIDE.md              # 训练指南
+├── requirements.txt               # Python依赖
+├── train_with_conda.sh            # 训练启动脚本
+└── monitor_training.sh            # 训练监控脚本
+```
 
-本项目使用的卷积神经网络来自 Nature 论文：
+## 🎯 训练配置
 
-[1] [Human-level control through deep reinforcement learning](https://www.nature.com/articles/nature14236)
+编辑 `main/train_config.py` 调整训练参数：
+
+```python
+# 关键参数
+NUM_ENV = 32                    # 并行环境数量
+TOTAL_TIMESTEPS = 100_000_000   # 总训练步数（约8-12小时）
+LEARNING_RATE_START = 1e-4      # 初始学习率
+N_EPOCHS = 4                    # 每次更新的训练轮数
+BATCH_SIZE = 1024               # 批次大小
+GAMMA = 0.99                    # 折扣因子
+```
+
+## 📈 训练技巧
+
+### 稳定训练
+- 使用 `train_cnn_simple.py` 和默认配置
+- 在TensorBoard中监控 `rollout/ep_rew_mean`
+- 每1M步保存检查点
+
+### 加速训练
+- 增加 `NUM_ENV`（如果内存足够）
+- 使用GPU/MPS加速
+- 减少 `TOTAL_TIMESTEPS` 进行快速测试
+
+### 训练崩溃
+- 降低 `LEARNING_RATE_START`（如5e-5）
+- 减少 `N_EPOCHS`（如3）
+- 降低 `NUM_ENV`（如16）
+
+## 🔬 高级功能
+
+### 课程学习
+
+在逐渐增大的棋盘上渐进式训练：
+
+```bash
+python train_cnn_curriculum.py
+```
+
+阶段：6×6 → 8×8 → 10×10 → 12×12
+
+### 哈密尔顿基准
+
+测试理论性能上限：
+
+```bash
+python hamiltonian_agent.py
+```
+
+### 模型对比
+
+对比多个训练好的模型：
+
+```bash
+python test_cnn_v2.py --compare \
+  trained_models_cnn/ppo_snake_final.zip \
+  trained_models_cnn_v2_mps/ppo_snake_final_v2.zip \
+  50
+```
+
+## 📚 文档
+
+- **[docs/](docs/)** - 完整文档中心
+- **[docs/PROGRESS_REPORT.md](docs/PROGRESS_REPORT.md)** - 🆕 最新训练进度和成果
+- **[docs/USAGE_GUIDE.md](docs/USAGE_GUIDE.md)** - 训练脚本详细使用指南
+- **[docs/PROJECT_ARCHITECTURE.md](docs/PROJECT_ARCHITECTURE.md)** - 完整架构文档
+- **[docs/TRAINING_GUIDE.md](docs/TRAINING_GUIDE.md)** - 高级训练策略和故障排除
+
+## 🛠️ 故障排除
+
+### 为什么有这么多Python进程？
+正常现象！每个并行环境在独立进程中运行。32个环境 = 32个子进程 + 1个主进程。
+
+### 训练太慢？
+- 增加 `NUM_ENV`（更多并行环境）
+- 使用GPU/MPS而非CPU
+- 减少 `TOTAL_TIMESTEPS` 进行测试
+
+### 内存不足？
+- 减少 `NUM_ENV`（如16）
+- 降低 `BATCH_SIZE`（如512）
+- 关闭其他应用程序
+
+### 性能下降？
+- 在 `train_config.py` 中降低学习率
+- 减少 `N_EPOCHS`
+- 在TensorBoard中检查不稳定迹象
+
+## 🤝 贡献
+
+欢迎贡献！请随时提交问题和拉取请求。
+
+## 📄 许可证
+
+本项目采用MIT许可证 - 详见 [LICENSE](LICENSE) 文件。
+
+## 🙏 致谢
+
+- [Stable-Baselines3](https://stable-baselines3.readthedocs.io/) - 强化学习算法
+- [Gymnasium](https://gymnasium.farama.org/) - 强化学习环境接口
+- [Pygame](https://www.pygame.org/) - 游戏引擎
+- [PPO论文](https://arxiv.org/abs/1707.06347) - 算法参考
+
+## 📞 联系方式
+
+如有问题和讨论，请在GitHub上提交issue。
+
+---
+
+**最后更新：** 2024-12-09

@@ -1,89 +1,245 @@
-# SnakeAI
+# SnakeAI - Deep Reinforcement Learning Snake Game
 
-[简体中文](README_CN.md) | English | [日本語](README_JA.md)
+[简体中文](README_CN.md) | English
 
-This project contains the program scripts for the classic game "Snake" and an artificial intelligence agent that can play the game automatically. The intelligent agent is trained using deep reinforcement learning and includes two versions: an agent based on a Multi-Layer Perceptron (MLP) and an agent based on a Convolution Neural Network (CNN), with the latter having a higher average game score.
+A Snake game AI trained with Deep Reinforcement Learning using PPO (Proximal Policy Optimization) algorithm. The project includes CNN and MLP-based agents, with the CNN version achieving superior performance.
 
-### File Structure
+## 🎮 Features
+
+- **Classic Snake Game** - Playable game implementation using Pygame
+- **CNN Agent** - Convolutional Neural Network based agent with visual input
+- **MLP Agent** - Multi-Layer Perceptron agent with feature-based input
+- **Curriculum Learning** - Progressive training from simple to complex
+- **Action Masking** - Prevents invalid moves for efficient training
+- **Parallel Training** - Multi-process environment for faster learning
+
+## 📊 Performance
+
+| Model | Training Speed | Avg Reward | Stability | Use Case |
+|-------|---------------|------------|-----------|----------|
+| CNN (Improved) | ⚡⚡ | ~15-17 | ⭐⭐⭐ | **Production** ⭐ |
+| MLP | ⚡⚡⚡ | ~17 | ⭐⭐ | Fast Prototyping |
+| Curriculum | ⚡⚡ | ~14-16 | ⭐⭐⭐ | Stable Training |
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python 3.8+
+- Conda (recommended)
+- CUDA-capable GPU (optional, for faster training)
+
+### Installation
 
 ```bash
-├───main
-│   ├───logs
-│   ├───trained_models_cnn
-│   ├───trained_models_mlp
-│   └───scripts
-├───utils
-│   └───scripts
-```
+# Create conda environment
+conda create -n SnakeAI-new python=3.11
+conda activate SnakeAI-new
 
-The main code folder for the project is `main/`. It contains `logs/`, which includes terminal text and data curves of the training process (viewable using Tensorboard); `trained_models_cnn/` and `trained_models_mlp/` respectively contain the model weight files for the convolutional network and perceptron models at different stages, which can be used for running tests in `test_cnn.py` and `test_mlp.py` to observe the actual game performance of the two intelligent agents at different training stages.
-
-The other folder `utils/` includes two utility scripts. `check_gpu_status/` is used to check if the GPU can be called by PyTorch; `compress_code.py` can remove all indentation and line breaks from the code, turning it into a tightly arranged single line of text for easier communication with GPT-4 when asking for code suggestions (GPT-4's understanding of code is far superior to humans and doesn't require indentation, line breaks, etc.).
-
-## Running Guide
-
-This project is based on the Python programming language and mainly uses external code libraries such as [Pygame](https://www.pygame.org/news)、[OpenAI Gym](https://github.com/openai/gym)、[Stable-Baselines3](https://stable-baselines3.readthedocs.io/en/master/). The Python version used for running the program is 3.8.16. It is recommended to use [Anaconda](https://www.anaconda.com) to configure the Python environment. The following setup process has been tested on the Windows 11 system. The following commands are for the console/terminal (Console/Terminal/Shell).
-
-### Environment Configuration
-
-```bash
-# Create a conda environment named SnakeAI with Python version 3.8.16
-conda create -n SnakeAI python=3.8.16
-conda activate SnakeAI
-
-# [Optional] To use GPU for training, manually install the full version of PyTorch
-conda install pytorch=2.0.0 torchvision pytorch-cuda=11.8 -c pytorch -c nvidia
-
-# [Optional] Run the script to test if PyTorch can successfully call the GPU
-python .\utils\check_gpu_status.py
-
-# Install external code libraries
+# Install dependencies
 pip install -r requirements.txt
+
+# [Optional] For GPU training on NVIDIA
+# PyTorch with CUDA support (adjust CUDA version as needed)
+conda install pytorch torchvision pytorch-cuda=12.1 -c pytorch -c nvidia
+
+# [Optional] For Apple Silicon (M1/M2/M3)
+# MPS (Metal Performance Shaders) is automatically detected
+# PyTorch 2.5+ has native MPS support
 ```
 
-### Running Tests
+**Current Environment Versions:**
+- Python: 3.11.14
+- PyTorch: 2.5.1
+- Stable-Baselines3: 2.7.1
+- Gymnasium: 1.2.2
+- Pygame: 2.6.1
 
-The `main/` folder of the project contains the program scripts for the classic game "Snake", based on the [Pygame](https://www.pygame.org/news) code library. You can directly run the following command to play the game:
+### Play the Game
 
 ```bash
-cd [parent folder of the project]/snake-ai/main
-python .\snake_game.py
+cd main
+python snake_game.py
 ```
 
-After completing the environment configuration, you can run `test_cnn.py` or `test_mlp.py` in the `main/` folder to test and observe the actual performance of the two intelligent agents at different training stages.
+### Train Your Own Agent
 
 ```bash
-cd [parent folder of the project]/snake-ai/main
-python test_cnn.py
-python test_mlp.py
+cd main
+
+# Recommended: Config-based training
+python train_cnn_simple.py
+
+# Or use other training scripts
+python train_cnn.py          # Baseline CNN
+python train_mlp.py          # MLP version
+python train_cnn_curriculum.py  # Curriculum learning
 ```
 
-Model weight files are stored in the `main/trained_models_cnn/` and `main/trained_models_mlp/` folders. Both test scripts call the trained models by default. If you want to observe the AI performance at different training stages, you can modify the `MODEL_PATH` variable in the test scripts to point to the file path of other models.
-
-### Training Models
-
-If you need to retrain the models, you can run `train_cnn.py` or `train_mlp.py` in the `main/` folder.
+### Test Trained Model
 
 ```bash
-cd [parent folder of the project]/snake-ai/main
-python train_cnn.py
-python train_mlp.py
+cd main
+
+# Test single model
+python test_cnn_v2.py trained_models_cnn_v2_mps/ppo_snake_final_v2.zip 10
+
+# Compare multiple models
+python test_cnn_v2.py --compare model1.zip model2.zip model3.zip 50
 ```
 
-### Viewing Curves
-
-The project includes Tensorboard curve graphs of the training process. You can use Tensorboard to view detailed data. It is recommended to use the integrated Tensorboard plugin in VSCode for direct viewing, or you can use the traditional method:
+### Monitor Training
 
 ```bash
-cd [parent folder of the project]/snake-ai/main
-tensorboard --logdir=logs/
+# Start TensorBoard
+tensorboard --logdir main/logs
+
+# Open browser to http://localhost:6006
 ```
 
-Open the default Tensorboard service address `http://localhost:6006/` in your browser to view the interactive curve graphs of the training process.
+## 📁 Project Structure
 
-## Acknowledgements
-The external code libraries used in this project include [Pygame](https://www.pygame.org/news)、[OpenAI Gym](https://github.com/openai/gym)、[Stable-Baselines3](https://stable-baselines3.readthedocs.io/en/master/). Thanks all the software developers for their selfless dedication to the open-source community!
+```
+snake-ai/
+├── main/                           # Main code directory
+│   ├── snake_game.py              # Game engine
+│   ├── snake_game_custom_wrapper_cnn_v2.py  # CNN environment wrapper
+│   ├── snake_game_custom_wrapper_mlp.py     # MLP environment wrapper
+│   ├── train_config.py            # Centralized training config
+│   ├── train_cnn_simple.py        # ⭐ Recommended training script
+│   ├── train_cnn.py               # Baseline CNN training
+│   ├── train_mlp.py               # MLP training
+│   ├── train_cnn_curriculum.py    # Curriculum learning
+│   ├── test_cnn_v2.py             # CNN model testing
+│   ├── test_mlp.py                # MLP model testing
+│   ├── hamiltonian_agent.py       # Baseline algorithm
+│   ├── trained_models_*/          # Saved models
+│   ├── logs/                      # TensorBoard logs
+│   └── sound/                     # Sound effects
+├── docs/                          # Documentation
+│   ├── README.md                  # Documentation hub
+│   ├── USAGE_GUIDE.md             # Training scripts guide
+│   ├── TRAINING_GUIDE.md          # Training optimization
+│   └── PROJECT_ARCHITECTURE.md    # Technical architecture
+├── utils/                         # Utility scripts
+│   ├── check_gpu_status.py        # GPU detection
+│   └── compress_code.py           # Code compression tool
+├── README.md                      # This file
+├── README_CN.md                   # Chinese README
+├── requirements.txt               # Python dependencies
+├── train_with_conda.sh            # Training launcher script
+└── monitor_training.sh            # Training monitor script
+```
 
-The convolutional neural network used in this project is from the Nature paper:
+## 🎯 Training Configuration
 
-[1] [Human-level control through deep reinforcement learning](https://www.nature.com/articles/nature14236)
+Edit `main/train_config.py` to adjust training parameters:
+
+```python
+# Key parameters
+NUM_ENV = 32                    # Parallel environments
+TOTAL_TIMESTEPS = 100_000_000   # Total training steps (~8-12 hours)
+LEARNING_RATE_START = 1e-4      # Initial learning rate
+N_EPOCHS = 4                    # Training epochs per update
+BATCH_SIZE = 1024               # Batch size
+GAMMA = 0.99                    # Discount factor
+```
+
+## 📈 Training Tips
+
+### For Stable Training
+- Use `train_cnn_simple.py` with default config
+- Monitor `rollout/ep_rew_mean` in TensorBoard
+- Save checkpoints every 1M steps
+
+### For Faster Training
+- Increase `NUM_ENV` (if memory allows)
+- Use GPU/MPS acceleration
+- Reduce `TOTAL_TIMESTEPS` for quick tests
+
+### If Training Crashes
+- Reduce `LEARNING_RATE_START` (e.g., 5e-5)
+- Decrease `N_EPOCHS` (e.g., 3)
+- Lower `NUM_ENV` (e.g., 16)
+
+## 🔬 Advanced Features
+
+### Curriculum Learning
+
+Train progressively on increasing board sizes:
+
+```bash
+python train_cnn_curriculum.py
+```
+
+Stages: 6×6 → 8×8 → 10×10 → 12×12
+
+### Hamiltonian Baseline
+
+Test the theoretical upper bound:
+
+```bash
+python hamiltonian_agent.py
+```
+
+### Model Comparison
+
+Compare multiple trained models:
+
+```bash
+python test_cnn_v2.py --compare \
+  trained_models_cnn/ppo_snake_final.zip \
+  trained_models_cnn_v2_mps/ppo_snake_final_v2.zip \
+  50
+```
+
+## 📚 Documentation
+
+- **[docs/](docs/)** - Complete documentation hub
+- **[docs/PROGRESS_REPORT.md](docs/PROGRESS_REPORT.md)** - 🆕 Latest training progress and achievements
+- **[docs/USAGE_GUIDE.md](docs/USAGE_GUIDE.md)** - Detailed usage guide for training scripts
+- **[docs/PROJECT_ARCHITECTURE.md](docs/PROJECT_ARCHITECTURE.md)** - Complete architecture documentation
+- **[docs/TRAINING_GUIDE.md](docs/TRAINING_GUIDE.md)** - Advanced training strategies and troubleshooting
+
+## 🛠️ Troubleshooting
+
+### Many Python Processes?
+Normal! Each parallel environment runs in its own process. 32 environments = 32 child processes + 1 main process.
+
+### Training Too Slow?
+- Increase `NUM_ENV` (more parallel environments)
+- Use GPU/MPS instead of CPU
+- Reduce `TOTAL_TIMESTEPS` for testing
+
+### Out of Memory?
+- Reduce `NUM_ENV` (e.g., 16)
+- Decrease `BATCH_SIZE` (e.g., 512)
+- Close other applications
+
+### Performance Degradation?
+- Lower learning rate in `train_config.py`
+- Reduce `N_EPOCHS`
+- Check TensorBoard for instability signs
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit issues and pull requests.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [Stable-Baselines3](https://stable-baselines3.readthedocs.io/) - RL algorithms
+- [Gymnasium](https://gymnasium.farama.org/) - RL environment interface
+- [Pygame](https://www.pygame.org/) - Game engine
+- [PPO Paper](https://arxiv.org/abs/1707.06347) - Algorithm reference
+
+## 📞 Contact
+
+For questions and discussions, please open an issue on GitHub.
+
+---
+
+**Last Updated:** 2024-12-09

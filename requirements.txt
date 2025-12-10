@@ -1,5 +1,20 @@
-gymnasium>=0.29.0
-stable-baselines3>=2.2.0
-sb3-contrib>=2.2.0
-pygame>=2.5.0
+# Snake AI Dependencies
+# Tested with Python 3.11.14
+
+# Core RL libraries
+gymnasium>=1.0.0
+stable-baselines3>=2.7.0
+sb3-contrib>=2.7.0
+
+# Game engine
+pygame>=2.6.0
+
+# Deep learning (install separately for GPU support)
+# torch>=2.5.0  # Uncomment if not using conda for PyTorch
+# torchvision>=0.20.0
+
+# Monitoring and logging
 tensorboard>=2.15.0
+
+# Utilities
+numpy>=1.24.0

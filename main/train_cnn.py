@@ -14,7 +14,7 @@ from stable_baselines3.common.callbacks import CheckpointCallback
 from sb3_contrib import MaskablePPO
 from sb3_contrib.common.wrappers import ActionMasker
 
-from snake_game_custom_wrapper_cnn import SnakeEnv
+from snake_game_custom_wrapper_cnn_v2 import SnakeEnv
 
 if torch.backends.mps.is_available():
     NUM_ENV = 32 * 2
