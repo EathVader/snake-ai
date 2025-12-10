@@ -40,7 +40,7 @@ def find_next_action(snake_head, next_position):
         return -1
 
 def main():
-    seed = random.randint(0, 1e9)
+    seed = random.randint(0, int(1e9))
     print(f"Using seed = {seed} for testing.")
 
     env = SnakeEnv(silent_mode=False, seed=seed, board_size=BOARD_SIZE)

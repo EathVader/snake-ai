@@ -100,7 +100,7 @@ def train_stage(stage, board_size, model=None, total_timesteps=10_000_000):
     # Generate seeds
     seed_set = set()
     while len(seed_set) < NUM_ENV:
-        seed_set.add(random.randint(0, 1e9))
+        seed_set.add(random.randint(0, int(1e9)))
     seed_list = list(seed_set)
 
     # Create environments with current board size

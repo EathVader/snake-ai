@@ -66,7 +66,7 @@ def main():
     # Generate random seeds for each environment
     seed_set = set()
     while len(seed_set) < config.NUM_ENV:
-        seed_set.add(random.randint(0, 1e9))
+        seed_set.add(random.randint(0, int(1e9)))
     seed_list = list(seed_set)
 
     # Create vectorized environment
