@@ -31,21 +31,42 @@
 
 ### 安装
 
+#### 方式1：自动安装（推荐）
+
+```bash
+# CUDA GPU系统
+conda env create -f environment.yml
+
+# 仅CPU系统
+conda env create -f environment-cpu.yml
+
+# 激活环境
+conda activate SnakeAI-new
+
+# 验证安装
+python utils/check_cuda_status.py
+```
+
+#### 方式2：手动安装
+
 ```bash
 # 创建conda环境
 conda create -n SnakeAI-new python=3.11
 conda activate SnakeAI-new
 
-# 安装依赖
-pip install -r requirements.txt
+# 安装PyTorch（选择一个）
+# CUDA 12.1版本
+conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
 
-# [可选] NVIDIA GPU加速
-# 安装支持CUDA的PyTorch（根据需要调整CUDA版本）
-conda install pytorch torchvision pytorch-cuda=12.1 -c pytorch -c nvidia
+# 仅CPU版本
+conda install pytorch torchvision torchaudio cpuonly -c pytorch
 
-# [可选] Apple Silicon (M1/M2/M3)
-# MPS (Metal Performance Shaders) 会自动检测
-# PyTorch 2.5+ 原生支持MPS
+# 安装其他依赖
+conda install pygame numpy tensorboard -c conda-forge
+pip install gymnasium stable-baselines3 sb3-contrib
+
+# 验证安装
+python utils/check_cuda_status.py
 ```
 
 **当前环境版本：**

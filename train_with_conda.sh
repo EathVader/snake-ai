@@ -31,9 +31,10 @@ if ! conda env list | grep -q "^${CONDA_ENV} "; then
     conda env list
     echo ""
     echo "To create the environment / 创建环境:"
-    echo "  conda create -n ${CONDA_ENV} python=3.11"
-    echo "  conda activate ${CONDA_ENV}"
-    echo "  pip install -r requirements.txt"
+    echo "  For CUDA GPU / CUDA GPU:"
+    echo "    conda env create -f environment.yml"
+    echo "  For CPU only / 仅CPU:"
+    echo "    conda env create -f environment-cpu.yml"
     exit 1
 fi
 
@@ -43,15 +44,20 @@ conda activate ${CONDA_ENV}
 
 if ! python -c "import torch, stable_baselines3, gymnasium, pygame" 2>/dev/null; then
     echo "Warning: Some dependencies missing / 警告：缺少某些依赖"
-    echo "Installing missing packages / 安装缺失的包..."
-    pip install -r requirements.txt
+    echo "Installing missing packages using conda / 使用conda安装缺失的包..."
     
-    # Check for CUDA if available
+    # Check for CUDA and install appropriate environment
     if command -v nvidia-smi &> /dev/null; then
-        echo "NVIDIA GPU detected, installing CUDA PyTorch..."
-        echo "检测到NVIDIA GPU，安装CUDA版PyTorch..."
-        pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+        echo "NVIDIA GPU detected, installing CUDA environment..."
+        echo "检测到NVIDIA GPU，安装CUDA环境..."
+        conda env update -n ${CONDA_ENV} -f environment.yml
+    else
+        echo "No NVIDIA GPU detected, installing CPU environment..."
+        echo "未检测到NVIDIA GPU，安装CPU环境..."
+        conda env update -n ${CONDA_ENV} -f environment-cpu.yml
     fi
+    
+    echo "Dependencies installed successfully / 依赖安装成功"
 fi
 
 echo "Activating conda environment: ${CONDA_ENV}"

@@ -23,31 +23,58 @@ A Snake game AI trained with Deep Reinforcement Learning using PPO (Proximal Pol
 
 ## 🚀 Quick Start
 
+### One-Command Setup (Easiest) / 一键安装（最简单）
+
+```bash
+# Clone and setup everything automatically
+git clone https://github.com/EathVader/snake-ai.git
+cd snake-ai
+./setup_environment.sh
+```
+
 ### Prerequisites
 
-- Python 3.8+
-- Conda (recommended)
+- Python 3.11
+- Conda (Anaconda/Miniconda)
 - CUDA-capable GPU (optional, for faster training)
 
 ### Installation
+
+#### Option 1: Automatic Setup (Recommended) / 自动安装（推荐）
+
+```bash
+# For CUDA GPU systems / CUDA GPU系统
+conda env create -f environment.yml
+
+# For CPU-only systems / 仅CPU系统
+conda env create -f environment-cpu.yml
+
+# Activate environment / 激活环境
+conda activate SnakeAI-new
+
+# Verify installation / 验证安装
+python utils/check_cuda_status.py
+```
+
+#### Option 2: Manual Setup / 手动安装
 
 ```bash
 # Create conda environment
 conda create -n SnakeAI-new python=3.11
 conda activate SnakeAI-new
 
-# Install dependencies
-pip install -r requirements.txt
+# Install PyTorch (choose one) / 安装PyTorch（选择一个）
+# For CUDA 12.1
+conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
 
-# [Recommended] For GPU training on NVIDIA
-# Check your CUDA version first: nvidia-smi
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+# For CPU only
+conda install pytorch torchvision torchaudio cpuonly -c pytorch
 
-# [Optional] For Apple Silicon (M1/M2/M3)
-# MPS (Metal Performance Shaders) is automatically detected
-# PyTorch 2.5+ has native MPS support
+# Install other dependencies / 安装其他依赖
+conda install pygame numpy tensorboard -c conda-forge
+pip install gymnasium stable-baselines3 sb3-contrib
 
-# Verify installation
+# Verify installation / 验证安装
 python utils/check_cuda_status.py
 ```
 
@@ -129,7 +156,10 @@ snake-ai/
 │   └── compress_code.py           # Code compression tool
 ├── README.md                      # This file
 ├── README_CN.md                   # Chinese README
-├── requirements.txt               # Python dependencies
+├── environment.yml                # Conda environment (CUDA)
+├── environment-cpu.yml            # Conda environment (CPU)
+├── requirements.txt               # Legacy pip requirements
+├── setup_environment.sh           # Quick setup script
 ├── train_with_conda.sh            # Training launcher script
 └── monitor_training.sh            # Training monitor script
 ```

@@ -53,11 +53,13 @@ def check_cuda_status():
             
             # Check for common issues
             print("\nTroubleshooting / 故障排除:")
-            print("1. Install CUDA-enabled PyTorch:")
-            print("   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121")
-            print("2. Check NVIDIA driver:")
+            print("1. Install CUDA-enabled PyTorch using conda:")
+            print("   conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia")
+            print("2. Or use environment file:")
+            print("   conda env create -f environment.yml")
+            print("3. Check NVIDIA driver:")
             print("   nvidia-smi")
-            print("3. Verify CUDA installation:")
+            print("4. Verify CUDA installation:")
             print("   nvcc --version")
         
         # Check MPS (Apple Silicon)
