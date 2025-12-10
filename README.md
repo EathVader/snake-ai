@@ -39,13 +39,16 @@ conda activate SnakeAI-new
 # Install dependencies
 pip install -r requirements.txt
 
-# [Optional] For GPU training on NVIDIA
-# PyTorch with CUDA support (adjust CUDA version as needed)
-conda install pytorch torchvision pytorch-cuda=12.1 -c pytorch -c nvidia
+# [Recommended] For GPU training on NVIDIA
+# Check your CUDA version first: nvidia-smi
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 
 # [Optional] For Apple Silicon (M1/M2/M3)
 # MPS (Metal Performance Shaders) is automatically detected
 # PyTorch 2.5+ has native MPS support
+
+# Verify installation
+python utils/check_cuda_status.py
 ```
 
 **Current Environment Versions:**

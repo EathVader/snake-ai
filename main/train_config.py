@@ -121,10 +121,20 @@ SAVE_DIR_PREFIX = "trained_models_cnn_v2"
 
 def get_config_summary():
     """Get configuration summary / 获取配置摘要"""
+    device_info = ""
+    if DEVICE == "cuda":
+        try:
+            import torch
+            if torch.cuda.is_available():
+                device_info = f"\nCUDA Device: {torch.cuda.get_device_name(0)}"
+                device_info += f"\nCUDA Memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f}GB"
+        except:
+            pass
+    
     return f"""
 Training Configuration / 训练配置:
 {'='*50}
-Device / 设备: {DEVICE}
+Device / 设备: {DEVICE}{device_info}
 Parallel Environments / 并行环境: {NUM_ENV}
 Total Timesteps / 总步数: {TOTAL_TIMESTEPS:,}
 Batch Size / 批次大小: {BATCH_SIZE}
@@ -134,7 +144,7 @@ Board Size / 棋盘大小: {BOARD_SIZE}x{BOARD_SIZE}
 
 Expected Memory Usage / 预期内存占用:
 - RAM: ~{NUM_ENV * 100}MB - {NUM_ENV * 200}MB
-- VRAM: ~2-4GB
+- VRAM: ~2-4GB (CUDA) / ~1-2GB (CPU/MPS)
 
 Checkpoint Frequency / 检查点频率:
 - Every {CHECKPOINT_INTERVAL * NUM_ENV:,} steps
